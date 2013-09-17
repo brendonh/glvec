@@ -32,13 +32,57 @@ func M4Copy(result, m *Mat4) {
 	}
 }
 
-func M4MakeTransform(result *Mat4, trans *Vec3) {
+func M4MakeTransform(result *Mat4, trans Vec3) {
 	M4Ident(result)
+	M4SetTransform(result, trans)
+}
+
+func M4SetTransform(result *Mat4, trans Vec3) {
 	result[12] = trans[0]
 	result[13] = trans[1]
 	result[14] = trans[2]
 }
 
+
+func M4MakeScale(result *Mat4, scale float32) {
+	M4Ident(result)
+	result[0] = scale
+	result[5] = scale
+	result[10] = scale
+}
+
+
+func M4MakeRotation(result *Mat4, radians float32, unitVec Vec3) {
+	s := float32(math.Sin(float64(radians)))
+	c := float32(math.Cos(float64(radians)))
+	x := unitVec[0]
+	y := unitVec[1]
+	z := unitVec[2]
+	xy := x * y
+	yz := y * z
+	zx := z * x
+	oneMinusC := 1.0 - c
+
+	result[0] = ((x * x) * oneMinusC) + c
+	result[1] = (xy * oneMinusC) + (z * s)
+	result[2] = (zx * oneMinusC) - (y * s)
+	result[3] = 0.0
+
+    result[4] = (xy * oneMinusC) - (z * s)
+	result[5] = ((y * y) * oneMinusC) + c
+	result[6] = (yz * oneMinusC) + (x * s)
+	result[7] = 0.0
+
+	result[8] = (zx * oneMinusC) + (y * s)
+	result[9] = (yz * oneMinusC) - (x * s)
+	result[10] = ((z * z) * oneMinusC) + c
+	result[11] = 0.0
+
+	result[12] = 0.0
+	result[13] = 0.0
+	result[14] = 0.0
+	result[15] = 1.0
+}
 
 
 func M4Transpose(result, m *Mat4) {
@@ -229,4 +273,43 @@ func M4MulM4(result, left, right *Mat4) {
 		left[3]*right[12] + left[7]*right[13] + left[11]*right[14] + left[15]*right[15],
 	}
 	M4Copy(result, &temp)
+}
+
+func M4LookAt(result *Mat4, eye, center, up Vec3) {
+	var f Vec3
+	V3Sub(&f, center, eye)
+	V3Normalize(&f, f)
+	
+	V3Normalize(&up, up)
+
+	var s, u Vec3
+	V3Cross(&s, f, up)
+	V3Cross(&u, s, f)
+
+	M := Mat4 {
+		s[0], u[0], -f[0], 0,
+		s[1], u[1], -f[1], 0, 
+		s[2], u[2], -f[2], 0, 
+		0, 0, 0, 1,
+	}
+
+	var MT Mat4
+	V3Neg(&eye, eye)
+	M4MakeTransform(&MT, eye)
+
+	M4MulM4(result, &M, &MT)
+}
+
+func M4MulV3(result *Vec3, m *Mat4, v Vec3) {
+	result[0] = m[0]*v[0] + m[4]*v[1] + m[8] * v[2] + m[12]
+	result[1] = m[1]*v[0] + m[5]*v[1] + m[9] * v[2] + m[13]
+	result[2] = m[2]*v[0] + m[6]*v[1] + m[10] * v[2] + m[14]
+}
+
+
+func M4MulV4(result *Vec4, m *Mat4, v Vec4) {
+	result[0] = m[0]*v[0] + m[4]*v[1] + m[8] * v[2] + m[12]
+	result[1] = m[1]*v[0] + m[5]*v[1] + m[9] * v[2] + m[13]
+	result[2] = m[2]*v[0] + m[6]*v[1] + m[10] * v[2] + m[14]
+	result[3] = m[3]*v[0] + m[7]*v[1] + m[11] * v[2] + m[15]
 }

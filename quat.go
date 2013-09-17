@@ -14,22 +14,22 @@ func QIdent(result *Quat) {
 	result.V[2] = 0.0
 }
 
-func QRotAng(result *Quat, angle float32, axis *Vec3) {
+func QRotAng(result *Quat, angle float32, axis Vec3) {
     sin_a := float32(math.Sin( float64(angle) / 2 ))
     cos_a := float32(math.Cos( float64(angle) / 2 ))
 
 	V3ScalarMul(&result.V, axis, sin_a)
 	result.W = cos_a
 
-	QNorm(result, result)
+	QNorm(result, *result)
 }
 
-func QConj(result, q *Quat) {
-	V3Neg(&result.V, &q.V)
+func QConj(result *Quat, q Quat) {
+	V3Neg(&result.V, q.V)
 	result.W =  q.W
 }
 
-func QMag(q *Quat) float32 {
+func QMag(q Quat) float32 {
     return float32(math.Sqrt(float64(
 		q.W * q.W +
 		q.V[0] * q.V[0] + 
@@ -37,30 +37,30 @@ func QMag(q *Quat) float32 {
 		q.V[2] * q.V[2])))
 }
 
-func QNorm(result, q *Quat) {
+func QNorm(result *Quat, q Quat) {
 	magInv := 1.0 / QMag(q)
-	V3ScalarMul(&result.V, &q.V, magInv)
+	V3ScalarMul(&result.V, q.V, magInv)
 	result.W = q.W * magInv
 }
 
 
-func QMul(result, left, right *Quat) {
+func QMul(result *Quat, left, right Quat) {
 	var temp Quat
-	temp.W = V3Dot(&left.V, &right.V)
+	temp.W = V3Dot(left.V, right.V)
 
 	var va, vb, vc Vec3
 	
-	V3Cross(&va, &left.V, &right.V)
-	V3ScalarMul(&vb, &left.V, right.W)
-	V3ScalarMul(&vc, &right.V, left.W)
+	V3Cross(&va, left.V, right.V)
+	V3ScalarMul(&vb, left.V, right.W)
+	V3ScalarMul(&vc, right.V, left.W)
 
-	V3Add(&va, &va, &vb)
-	V3Add(&temp.V, &va, &vc)
+	V3Add(&va, va, vb)
+	V3Add(&temp.V, va, vc)
 
-	QNorm(result, &temp)
+	QNorm(result, temp)
 }
 
-func QMat3(result *Mat3, q *Quat) {
+func QMat3(result *Mat3, q Quat) {
 	xx := q.V[0] * q.V[0]
     xy := q.V[0] * q.V[1]
     xz := q.V[0] * q.V[2]
@@ -86,7 +86,7 @@ func QMat3(result *Mat3, q *Quat) {
     result[8] = 1 - 2 * ( xx + yy )
 }
 
-func QMat4(result *Mat4, q *Quat) {
+func QMat4(result *Mat4, q Quat) {
 	xx := q.V[0] * q.V[0]
     xy := q.V[0] * q.V[1]
     xz := q.V[0] * q.V[2]

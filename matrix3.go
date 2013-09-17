@@ -84,10 +84,9 @@ func M3MulM3(result, left, right *Mat3) {
 	M3Copy(result, &temp)
 }
 
-func M3MulV3(result *Vec3, m *Mat3, v *Vec3) {
-	var temp Vec3
-	temp[0] = m[0]*v[0] + m[3]*v[1] + m[6]*v[2]
-	temp[1] = m[1]*v[0] + m[4]*v[1] + m[7]*v[2]
-	temp[2] = m[2]*v[0] + m[5]*v[1] + m[8]*v[2]
-	V3Copy(result, &temp)
+func M3MulV3(result *Vec3, m *Mat3, v Vec3) {
+	result[0] = m[0]*v[0] + m[3]*v[1] + m[6]*v[2]
+	result[1] = m[1]*v[0] + m[4]*v[1] + m[7]*v[2]
+	result[2] = m[2]*v[0] + m[5]*v[1] + m[8]*v[2]
 }
+
