@@ -86,25 +86,13 @@ func M4MakeRotation(result *Mat4, radians float32, unitVec Vec3) {
 
 
 func M4Transpose(result, m *Mat4) {
-	result[0] = m[0]
-	result[1] = m[4]
-	result[2] = m[8]
-	result[3] = m[12]
-
-	result[4] = m[1]
-	result[5] = m[5]
-	result[6] = m[9]
-	result[7] = m[13]
-
-	result[8] = m[2]
-	result[9] = m[6]
-	result[10] = m[10]
-	result[11] = m[14]
-
-	result[12] = m[3]
-	result[13] = m[7]
-	result[14] = m[11]
-	result[15] = m[15]
+	var temp = Mat4{
+		m[0],  m[4],  m[8], m[12],
+		m[1],  m[5],  m[9], m[13],
+		m[2],  m[6],  m[10], m[14],
+		m[3],  m[7],  m[11], m[15],
+	}
+	M4Copy(result, &temp)
 }
 
 
@@ -225,7 +213,7 @@ func M4Inverse(result, m *Mat4) {
 
     det := m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12]
 
-	if (math.Abs(float64(det)) < 0.0005) {
+	if (math.Abs(float64(det)) < 0.00005) {
 		M4Ident(result)
 		return
 	}
@@ -254,7 +242,7 @@ func M4RotationMatrix(result *Mat3, m *Mat4) {
 
 
 func M4MulM4(result, left, right *Mat4) {
-	var temp = Mat4 {
+	var temp = Mat4{
 		left[0]*right[0] + left[4]*right[1] + left[8]*right[2] + left[12]*right[3],
 		left[1]*right[0] + left[5]*right[1] + left[9]*right[2] + left[13]*right[3],
 		left[2]*right[0] + left[6]*right[1] + left[10]*right[2] + left[14]*right[3],
@@ -273,31 +261,6 @@ func M4MulM4(result, left, right *Mat4) {
 		left[3]*right[12] + left[7]*right[13] + left[11]*right[14] + left[15]*right[15],
 	}
 	M4Copy(result, &temp)
-}
-
-func M4LookAt(result *Mat4, eye, center, up Vec3) {
-	var f Vec3
-	V3Sub(&f, center, eye)
-	V3Normalize(&f, f)
-	
-	V3Normalize(&up, up)
-
-	var s, u Vec3
-	V3Cross(&s, f, up)
-	V3Cross(&u, s, f)
-
-	M := Mat4 {
-		s[0], u[0], -f[0], 0,
-		s[1], u[1], -f[1], 0, 
-		s[2], u[2], -f[2], 0, 
-		0, 0, 0, 1,
-	}
-
-	var MT Mat4
-	V3Neg(&eye, eye)
-	M4MakeTransform(&MT, eye)
-
-	M4MulM4(result, &M, &MT)
 }
 
 func M4MulV3(result *Vec3, m *Mat4, v Vec3) {

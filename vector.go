@@ -91,6 +91,12 @@ func V4Copy(result *Vec4, v Vec4) {
 	result[3] = v[3]
 }	
 
+func V4CopyV3(result *Vec3, v Vec4) {
+	result[0] = v[0]
+	result[1] = v[1]
+	result[2] = v[2]
+}
+
 func V4Add(result *Vec4, left, right Vec4) {
 	result[0] = left[0] + right[0]
 	result[1] = left[1] + right[1]
@@ -126,4 +132,25 @@ func V4Dot(left, right Vec4) float32 {
 	result += left[2] * right[2]
 	result += left[3] * right[3]
 	return result
+}
+
+
+func V4LengthSquared(vec Vec4) float32 {
+	result := vec[0] * vec[0]
+	result += vec[1] * vec[1]
+	result += vec[2] * vec[2]
+	result += vec[3] * vec[3]
+	return result
+}
+
+func V4Length(vec Vec4) float32 {
+	return float32(math.Sqrt(float64(V4LengthSquared(vec))))
+}
+
+func V4Normalize(result *Vec4, vec Vec4) {
+	lenInv := 1.0 / V4Length(vec)
+	result[0] = vec[0] * lenInv
+	result[1] = vec[1] * lenInv
+	result[2] = vec[2] * lenInv
+	result[3] = vec[3] * lenInv
 }

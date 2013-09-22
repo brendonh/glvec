@@ -46,7 +46,7 @@ func M3Det(m *Mat3) float32 {
 }
 
 
-func M3Inv(result, m *Mat3) {
+func M3Inverse(result, m *Mat3) {
 	det := M3Det(m)
 	if (math.Abs(float64(det)) < 0.0005) {
 		M3Ident(result)
