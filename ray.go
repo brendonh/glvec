@@ -11,9 +11,6 @@ type Ray struct {
 }
 
 func (r *Ray) PlaneIntersect(p Plane) (pos Vec3, ok bool) {
-	// var planePoint = Vec3{ 0.0, 0.0, 1.0 }
-	// var normal = Vec3 { 0.0, 0.0, 1.0 }
-
 	var origToPlane Vec3
 	V3Sub(&origToPlane, r.Origin, p.Point)
 
